@@ -4,15 +4,15 @@ import scipy.io as sio
 import pandas as pd
 import matplotlib.font_manager as fm
 #Figure 5a
-#ddqncnnabs= np.load('RefProb_RuleEnvDDQNCNNeps100 PAPER3/Results/DDQNCNNabsum.npy')
-#ddqncnnrule1000= np.load('RefProb_RuleEnvDDQNCNNeps1000 PAPER3/Results/DDQNCNNabsum.npy')
+#ddqnsumrule100= np.load('RefProb_RuleEnvDDQNCNNeps100 PAPER3/Results/DDQNCNNabsum.npy')
+#ddqnsumrule1000= np.load('RefProb_RuleEnvDDQNCNNeps1000 PAPER3/Results/DDQNCNNabsum.npy')
 fig = plt.figure(figsize=(50,20), dpi=300)
 ax = fig.add_subplot(111)
-plt.plot(np.arange(len(ddqncnnabs)), ddqncnnabs, linewidth=6,color='red', alpha=0.6,label='DDQN CNN(epsilon decay=100)')# 
+plt.plot(np.arange(len(ddqnsumrule100)), ddqnsumrule100, linewidth=6,color='red', alpha=0.6,label='DDQN CNN(epsilon decay=100)')# 
 #plt.plot(pd.Series(absum).rolling(100).mean(), linewidth=12, label='EPS DECAY')
-plt.plot(pd.Series(ddqncnnabs).rolling(100).mean(), linewidth=16,color='red')
-plt.plot(np.arange(len(ddqncnnrule1000)), ddqncnnrule1000, linewidth=6,color='lightcoral',alpha=0.3, label='DDQN CNN(epsilon decay=1000)')
-plt.plot(pd.Series(ddqncnnrule1000).rolling(100).mean(), linewidth=16, color='lightcoral')
+plt.plot(pd.Series(ddqnsumrule100).rolling(100).mean(), linewidth=16,color='red')
+plt.plot(np.arange(len(ddqnsumrule1000)), ddqnsumrule1000, linewidth=6,color='green',alpha=0.3, label='DDQN CNN(epsilon decay=1000)')
+plt.plot(pd.Series(ddqnsumrule1000).rolling(100).mean(), linewidth=16, color='green')
 font_properties = {'family': 'serif', 'weight': 'bold', 'size': 90}
 font = fm.FontProperties(family=font_properties['family'], weight=font_properties['weight'], size=font_properties['size'])
 plt.xticks(fontproperties=font, weight='bold')
@@ -67,12 +67,12 @@ plt.legend(prop=fm.FontProperties(**legend_font), loc='upper right')
 plt.show()
 
 #Figure 5c
-#24, 180, 225, 351
-#load DDQNCNNstates.npy as tl1000stat
-ddqnstat100_image = np.rot90(np.reshape(tl1000stat[328], (20, 20)), k=1)
+#124, 405, 1095, 1874
+#ddqncnnabs1000stat np.load('/Src/SourceCode/RefProb_RuleEnvDDQNCNNeps1000/Results/DDQNCNNabsorption.npy')
+ddqnstat1000_image = np.rot90(np.reshape(ddqncnnabs1000stat[124], (20, 20)), k=1)
 
 # Plot the image
-plt.imshow(ddqnstat100_image, cmap='gray', interpolation='nearest')
+plt.imshow(ddqnstat1000_image, cmap='gray', interpolation='nearest')
 plt.show()
 
 

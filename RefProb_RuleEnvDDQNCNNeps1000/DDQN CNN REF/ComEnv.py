@@ -78,16 +78,11 @@ def select_and_modify_pixels(matrix, n):
 class DDPGEnv():
     def __init__(self):
         self.size= 30
-      # self.state= state
-       # self.action_space= 101
-        self.lst= list(range(3,902))#np.linspace(3,902)
-        #self.state= np.random.choice([0, 1], size=(1,900), p=[0, 1])
-        #self.action_space= round(np.random.uniform(0, 1),2)  # action space round(np.random.uniform(0, 1),2) 
-        
+        self.lst= list(range(3,902))
 
     def ComSim(self,idx1_list, idx2_list):
         lst = list(range(2,902))
-        # lst= lst.tolist()
+
         client= mph.start(cores=1)
         model= client.create('Model')
         model.clear()
@@ -368,8 +363,6 @@ class DDPGEnv():
         model.result("pg3").set("ylabelactive", "off");
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
-
-        # observ=[state0, table_str[1]]
         #model.save('InputPython2')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
@@ -378,20 +371,12 @@ class DDPGEnv():
         self.state= np.reshape(self.state, (1,900))
         lst = list(range(2,902))
         lst=np.asarray(lst)
-        #P= np.random.uniform(0, 1) # action space
-        #state0=np.random.choice([0, 1], size=(1,900), p=[P, 1-P]) # state space
-
 
         idx1=np.where(state == -2)[1]
         idx2=np.where(state == 2)[1]
 
-
         idx1_list = lst[idx1]
         idx2_list = lst[idx2]
-
-
-        #idx1_list.insert(0, 1)
-
 
         return idx1_list, idx2_list
     
@@ -401,13 +386,10 @@ class DDPGEnv():
         initial_matrix= np.full((30, 15), -2)
         modified_matrix, count_changed = select_and_modify_pixels(initial_matrix, action)
         self.state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)
-#        self.state= np.random.choice([-2, 2], size=(1,900), p=[action/900, 1-(action/900)])
         self.state= np.reshape(self.state, (1,900))
         idx1_list, idx2_list=self.Bin2Ind(self.state)
         table_str=self.ComSim( idx1_list, idx2_list)
         # Reward
-
-            
         absorption = [str(i) for i in table_str[:,1]]
         absp= [float(i) for i in absorption]
         absorpSum= sum(float(i) for i in absorption)
@@ -415,15 +397,7 @@ class DDPGEnv():
         diff= 26-absorpSum
         
         reward= abs((1- diff/26)**(2)) 
-            
-#        if absorpSum > 23:
-#            reward= 500
-#        elif absorpSum > 20:
-#            reward= 400
-#        elif absorpSum > 19:
-#            reward= 100
-#        else:
-#            reward= -100
+        
         diff=26 - absorpSum
         reward= abs((1- diff/26)**(2)) 
         done = absorpSum >= 26 
@@ -434,6 +408,5 @@ class DDPGEnv():
     def reset(self):
         initial_matrix= np.full((30, 15), -2)
         self.state= np.concatenate((initial_matrix, np.flip(initial_matrix, axis=1)),axis=1)
-        #self.state = np.random.choice([-2, 2], size=(1,900), p=[0.1, 0.9])
         return self.state
     

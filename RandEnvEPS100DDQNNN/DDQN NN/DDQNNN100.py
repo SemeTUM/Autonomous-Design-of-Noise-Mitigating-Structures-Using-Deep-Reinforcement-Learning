@@ -5,6 +5,7 @@ Created on Sat Dec 30 15:16:29 2023
 @author: admin
 """
 import time
+import math
 import sys
 import numpy as np
 import random
@@ -17,6 +18,7 @@ from ComEnv import DDPGEnv# import comsol environment
 from collections import namedtuple, deque
 import scipy.io as sio
 import matplotlib.pyplot as plt
+import torch.optim as optim
 
 
 #ensure reproducibility of results
@@ -42,45 +44,10 @@ class DQN(nn.Module):
         
     def forward(self, x):
         return self.layers(x)   
-'''class DQNCnn(nn.Module):
-    def __init__(self, input_shape, num_actions):
-        super(DQNCnn, self).__init__()
-        self.input_shape = input_shape
-        self.num_actions = num_actions
-        
-        self.features = nn.Sequential(
-            nn.Conv2d(input_shape[0], 32, kernel_size=2, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=2, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(64, 128, kernel_size=2, stride=1),
-            nn.ReLU()
-        )
-        
-        self.fc = nn.Sequential(
-            nn.Linear(self.feature_size(), 128),
-            nn.ReLU(),
-#            nn.Linear(128, 256),
-#            nn.ReLU(),
-            nn.Linear(128, self.num_actions)
-        )
-        
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
-        return x
-    
-    def feature_size(self):
-        return self.features(autograd.Variable(torch.zeros(1, *self.input_shape))).view(1, -1).size(1)
-'''    
+
 #Replay buffer 
 class ReplayMemory:
-    """Fixed-size buffer to store experience tuples."""
-
-
     def __init__(self, buffer_size, batch_size, seed, device):
-
 
         self.memory = deque(maxlen=buffer_size)  
         self.batch_size = batch_size
@@ -89,14 +56,10 @@ class ReplayMemory:
         self.device= device
     
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
-        
-
     
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
         seed = 0
         torch.manual_seed(seed)
         np.random.seed(seed)
@@ -113,17 +76,16 @@ class ReplayMemory:
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
-        """Return the current size of internal memory."""
         return len(self.memory)
     
     
 # dqnAgent with Fixed Target network
-
 class DDQNAgent():
     seed = 0
     torch.manual_seed(seed)
     np.random.seed(seed)
     random.seed(seed)
+    
     def __init__(self, input_shape, action_size, seed, device, buffer_size, batch_size, gamma, lr, tau, update_every, replay_after, model):
 
         self.input_shape = input_shape
@@ -138,7 +100,6 @@ class DDQNAgent():
         self.replay_after = replay_after
         self.DQN = model
         self.tau = tau
-
         
         # Q-Network
         self.policy_net = self.DQN(input_shape, action_size).to(self.device)
@@ -182,7 +143,7 @@ class DDQNAgent():
         
         states, actions, rewards, next_states, dones = experiences 
         
-        Q_output = self.policy_net(states).gather(1, actions.unsqueeze(1)).squeeze(1)
+        Q_output = self.policy_net(next_states).gather(1, actions.unsqueeze(1)).squeeze(1)
         action_values = self.policy_net(next_states).detach()
           
         target_action_values = self.target_net(next_states).detach()
@@ -230,7 +191,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RuleEnvEPS100DDQNNN"
+result_directory = f"RuleEnv2EPS100DDQNNN"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -280,15 +241,6 @@ def train(n_episodes=2000):#100
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 #        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))
-        
-#        if i_episode % 100 == 0:
-#            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            plt.plot(np.arange(len(scores)), scores)
-#            plt.ylabel('Score')
-#            plt.xlabel('Episode')
-#            plt.show()
     
     return scores
 

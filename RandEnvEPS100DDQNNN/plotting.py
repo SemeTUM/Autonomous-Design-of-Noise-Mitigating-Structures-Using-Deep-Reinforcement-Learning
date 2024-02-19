@@ -4,13 +4,13 @@ import scipy.io as sio
 import pandas as pd
 import matplotlib.font_manager as fm
 #Figure 4c
-#ddqncnnrule>> np.load('Results/DDQNCNNabsorption.npy')
+#ddqncnnrule>> np.load('Results/DDQNCNNTL.npy')
 fig = plt.figure(figsize=(50,30), dpi=300)
 ax = fig.add_subplot(111)
 plt.plot(freq, ddqncnnrule[3], linewidth=20, label='#3')# 
-plt.plot(freq, ddqncnnrule[391], linewidth=20, label='#391')#
-plt.plot(freq, ddqncnnrule[403], linewidth=20,label='#403')#
-plt.plot(freq, ddqncnnrule[1725], linewidth=20,label='#1725')#
+plt.plot(freq, ddqncnnrule[233], linewidth=20, label='#233')#
+plt.plot(freq, ddqncnnrule[422], linewidth=20,label='#422')#
+plt.plot(freq, ddqncnnrule[819], linewidth=20,label='#819')#
 
 font_properties = {'family': 'serif', 'weight': 'bold', 'size': 90}
 font = fm.FontProperties(family=font_properties['family'], weight=font_properties['weight'], size=font_properties['size'])

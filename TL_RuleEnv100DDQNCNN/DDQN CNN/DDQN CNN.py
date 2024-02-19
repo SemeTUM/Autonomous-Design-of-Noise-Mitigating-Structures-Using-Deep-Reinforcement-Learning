@@ -15,12 +15,13 @@ import torch.nn as nn
 import torch.autograd as autograd 
 import torch.nn.functional as F
 #from ComEnv import DDPGEnv
-from HalfRuleBasedEnvTrans import TranMeta
+from HalfRuleBasedEnvTrans import TranMeta#import the environment
 from collections import namedtuple, deque
 import scipy.io as sio
 import matplotlib.pyplot as plt
+import torch.optim as optim
 
-
+# reproducibility
 seed = 0
 torch.manual_seed(seed)
 np.random.seed(seed)
@@ -28,6 +29,7 @@ random.seed(seed)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+#Q value
 class DQNCnn(nn.Module):
     def __init__(self, input_shape, num_actions):
         super(DQNCnn, self).__init__()
@@ -63,8 +65,6 @@ class DQNCnn(nn.Module):
 #Replay buffer 
 
 class ReplayMemory:
-    """Fixed-size buffer to store experience tuples."""
-
 
     def __init__(self, buffer_size, batch_size, seed, device):
 
@@ -76,14 +76,14 @@ class ReplayMemory:
         self.device= device
     
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
+        #Add a new experience to memory
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
         
-
     
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
+        #Randomly sample a batch of experiences from memory
+        #reproduce sample selection 
         seed = 0
         torch.manual_seed(seed)
         np.random.seed(seed)
@@ -100,19 +100,12 @@ class ReplayMemory:
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
-        """Return the current size of internal memory."""
+        #Return the current size of internal memory
         return len(self.memory)
     
-    
-## dqnAgent with Fixed Target network
-#import numpy as np
-#import torch
-#import torch.nn.functional as F
-import torch.optim as optim
-#import random
-
 
 class DDQNAgent():
+    #reproducibility
     seed = 0
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -126,16 +119,16 @@ class DDQNAgent():
         self.buffer_size = buffer_size
         self.batch_size = batch_size
         self.gamma = gamma
-        self.lr = lr
-        self.update_every = update_every
-        self.replay_after = replay_after
+        self.lr = lr#learning rate
+        self.update_every = update_every# frequency the target network should be updated
+        self.replay_after = replay_after# start learning from experience
         self.DQN = model
         self.tau = tau
 
         
         # Q-Network
-        self.policy_net = self.DQN(input_shape, action_size).to(self.device)
-        self.target_net = self.DQN(input_shape, action_size).to(self.device)
+        self.policy_net = self.DQN(input_shape, action_size).to(self.device)#online network
+        self.target_net = self.DQN(input_shape, action_size).to(self.device)#target network
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.lr)
         
         # Replay memory
@@ -173,7 +166,7 @@ class DDQNAgent():
     def learn(self, experiences):
         states, actions, rewards, next_states, dones=experiences
         
-        Q_policy_next= self.policy_net(states).detach()
+        Q_policy_next= self.policy_net(next_states).detach()
         Q_targets_next=self.target_net(next_states).detach()
         
         _, policy_actions=Q_policy_next.max(1, keepdim=True)
@@ -183,8 +176,6 @@ class DDQNAgent():
         
         Q_expected= self.policy_net(states).gather(1, actions.unsqueeze(1))
         
-    
-    
         loss = F.mse_loss(Q_expected, Q_targets[0].unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
@@ -222,7 +213,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"TL_RuleEnv100DDQNCNN"
+result_directory = f"TL_Rule2Env100DDQNCNN"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -261,27 +252,17 @@ def train(n_episodes=2000):#100
         ABSPSUM.append(absorpSum)
         ABSP.append(absp)
       
-        np.save(os.path.join(result_directory, "DQNCNNactions.npy"), ACTIONS)
-        np.save(os.path.join(result_directory, "DQNCNNscores.npy"), scores)
-        np.save(os.path.join(result_directory, "DQNCNNstates.npy"), STATES)
-        np.save(os.path.join(result_directory, "DQNCNNabsorption.npy"), ABSP)
-        np.save(os.path.join(result_directory, "DQNCNNabsum.npy"), ABSPSUM)
+        np.save(os.path.join(result_directory, "DDQNCNNactions.npy"), ACTIONS)
+        np.save(os.path.join(result_directory, "DDQNCNNscores.npy"), scores)
+        np.save(os.path.join(result_directory, "DDQNCNNstates.npy"), STATES)
+        np.save(os.path.join(result_directory, "DDQNCNNabsorption.npy"), ABSP)
+        np.save(os.path.join(result_directory, "DDQNCNNabsum.npy"), ABSPSUM)
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))
-            model_path = os.path.join(result_directory, "TLRuleMeta_ddqncnn{}.pth".format(i_episode))
+            model_path = os.path.join(result_directory, "TLRule_ddqncnn{}.pth".format(i_episode))
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-#        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))
-        
-#        if i_episode % 100 == 0:
-#            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            plt.plot(np.arange(len(scores)), scores)
-#            plt.ylabel('Score')
-#            plt.xlabel('Episode')
-#            plt.show()
     
     return scores
 

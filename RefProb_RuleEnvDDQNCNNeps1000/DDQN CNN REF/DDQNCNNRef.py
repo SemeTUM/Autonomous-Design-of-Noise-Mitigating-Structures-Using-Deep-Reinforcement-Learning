@@ -66,12 +66,7 @@ import random
 #import torch
 
 class ReplayMemory:
-    """Fixed-size buffer to store experience tuples."""
-
-
     def __init__(self, buffer_size, batch_size, seed, device):
-
-
         self.memory = deque(maxlen=buffer_size)  
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
@@ -79,14 +74,10 @@ class ReplayMemory:
         self.device= device
     
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
-        
 
-    
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
         seed = 0
         torch.manual_seed(seed)
         np.random.seed(seed)
@@ -103,14 +94,10 @@ class ReplayMemory:
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
-        """Return the current size of internal memory."""
         return len(self.memory)
     
     
 # dqnAgent with Fixed Target network
-
-
-
 class DDQNAgent():
     seed = 0
     torch.manual_seed(seed)
@@ -172,7 +159,7 @@ class DDQNAgent():
     def learn(self, experiences):
         states, actions, rewards, next_states, dones=experiences
         
-        Q_policy_next= self.policy_net(states).detach()
+        Q_policy_next= self.policy_net(next_states).detach()
         Q_targets_next=self.target_net(next_states).detach()
         
         _, policy_actions=Q_policy_next.max(1, keepdim=True)
@@ -181,9 +168,7 @@ class DDQNAgent():
         Q_targets= rewards + (self.gamma*Q_targets_next*(1 - dones))
         
         Q_expected= self.policy_net(states).gather(1, actions.unsqueeze(1))
-        
-    
-    
+
         loss = F.mse_loss(Q_expected, Q_targets[0].unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
@@ -200,8 +185,6 @@ class DDQNAgent():
 
 
 # HyperParameters
-
-
 INPUT_SHAPE = (1, 30, 30)
 ACTION_SIZE = 450#900#original 101
 SEED = 0
@@ -222,7 +205,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RuleEnvDDQNCNNeps1000"
+result_directory = f"RefProb_RuleEnv2DDQNCNNeps1000"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -230,9 +213,6 @@ agent = DDQNAgent(INPUT_SHAPE, ACTION_SIZE, SEED, device, BUFFER_SIZE, BATCH_SIZ
 
 ##epsilon
 epsilon_by_epsiode = lambda frame_idx: EPS_END + (EPS_START - EPS_END) * math.exp(-1. * frame_idx /EPS_DECAY)
-#env = DDPGEnv()
-##train
-
 
 def train(n_episodes=2000):#100
     ACTIONS= []
@@ -261,28 +241,19 @@ def train(n_episodes=2000):#100
         ABSPSUM.append(absorpSum)
         ABSP.append(absp)
       
-        np.save(os.path.join(result_directory, "DQNCNNactions.npy"), ACTIONS)
-        np.save(os.path.join(result_directory, "DQNCNNscores.npy"), scores)
-        np.save(os.path.join(result_directory, "DQNCNNstates.npy"), STATES)
-        np.save(os.path.join(result_directory, "DQNCNNabsorption.npy"), ABSP)
-        np.save(os.path.join(result_directory, "DQNCNNabsum.npy"), ABSPSUM)
+        np.save(os.path.join(result_directory, "DDQNCNNactions.npy"), ACTIONS)
+        np.save(os.path.join(result_directory, "DDQNCNNscores.npy"), scores)
+        np.save(os.path.join(result_directory, "DDQNCNNstates.npy"), STATES)
+        np.save(os.path.join(result_directory, "DDQNCNNabsorption.npy"), ABSP)
+        np.save(os.path.join(result_directory, "DDQNCNNabsum.npy"), ABSPSUM)
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))
-            model_path = os.path.join(result_directory, "RefRandtrained_dqncnn{}.pth".format(i_episode))
+            model_path = os.path.join(result_directory, "trained_ddqncnn{}.pth".format(i_episode))
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 #        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))
         
-#        if i_episode % 100 == 0:
-#            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            plt.plot(np.arange(len(scores)), scores)
-#            plt.ylabel('Score')
-#            plt.xlabel('Episode')
-#            plt.show()
-    
     return scores
 
 ###run the program

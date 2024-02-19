@@ -85,7 +85,6 @@ class TranMeta():
     def Transmission_Metamaterial(self, idx1_list):
     
         lst = list(range(3,402))
-        # lst= lst.tolist()
         client= mph.start(cores=3)
         model= client.create('Model')
         model.clear()
@@ -390,8 +389,7 @@ class TranMeta():
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
     
-        # observ=[state0, table_str[1]]
-        model.save('TLRule1000Meta106')
+        #model.save('TLRule1000Meta213')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
 
@@ -400,26 +398,13 @@ class TranMeta():
         state= np.reshape(state, (1,400))
 
         lst = list(range(3,403))
-   
-        #lst2 = lst + [400+ i for i in range(3,403)] + [800+ i for i in range(3,403)]+ [1600+ i for i in range(3,403)]
-        
         lst1=np.asarray(lst)
-        
-
         # Convert idx1 to a list of integers
         idx1=np.where(state == -2)[1]
-
-
-
-
         Org_list = [1,2, 2003]
-        #idx1=np.where(self.state == -2)[1]
         lst2=lst1[idx1]
-        #idx2=np.where(state == 2)[1]
     
         idx1_list = [i for i in lst2] + [400+ i for i in lst2] + [800+ i for i in lst2]+ [1200+ i for i in lst2] + [1600+ i for i in lst2]
-        #idx1_list = [lst[i] for i in idx1.tolist()] + [400+ i for i in idx1] + [800+ i for i in idx1]+ [1600+ i for i in idx1]
-        #idx2_list = lst[idx2]
     
         idx1_list[idx1_list!=2003]
         idx1_list= np.insert(Org_list,2,idx1_list)

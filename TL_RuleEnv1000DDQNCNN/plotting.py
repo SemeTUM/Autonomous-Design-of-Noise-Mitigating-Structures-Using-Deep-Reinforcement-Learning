@@ -6,9 +6,9 @@ import matplotlib.font_manager as fm
 
 
 #Figure 7a plotting
-#52, 90, 106, 324, 328
+#52,106, 213, 653, 1139, 1152
 #load DDQNCNNstates.npy as tl1000stat
-ddqnstat100_image = np.rot90(np.reshape(tl1000stat[328], (20, 20)), k=1)
+ddqnstat100_image = np.rot90(np.reshape(tl1000stat[52], (20, 20)), k=1)
 
 # Create a custom colormap for -2 and 2
 cmap = plt.cm.colors.ListedColormap(['white', 'black'])
@@ -20,13 +20,15 @@ plt.show()
 #plotting Figure 7b
 
 freq= np.linspace(300, 3000,28)# Frequency 
+ddqnTLabsrule1000=np.load('/Src/SourceCode/TL_RuleEnv1000DDQNCNN/DDQN CNN/TL_RuleEnv1000DDQNCNN2/DDQNCNNTL.npy')
 fig = plt.figure(figsize=(50,30), dpi=300)
 ax = fig.add_subplot(111)
-plt.plot(freq, tl1000tl[52], linewidth=20, label='#52')# 
-plt.plot(freq, tl1000tl[90], linewidth=20, label='#90')#
-plt.plot(freq, tl1000tl[106], linewidth=20,label='#106')#
-plt.plot(freq, tl1000tl[324], linewidth=20,label='#324')#
-plt.plot(freq, tl1000tl[328], linewidth=20,label='#328')#
+plt.plot(freq, ddqnTLabsrule1000[52], linewidth=20, label='#52')# 
+plt.plot(freq, ddqnTLabsrule1000[106], linewidth=20, label='#106')#
+plt.plot(freq, ddqnTLabsrule1000[213], linewidth=20,label='#213')#
+plt.plot(freq, ddqnTLabsrule1000[653], linewidth=20,label='#653')#
+plt.plot(freq, ddqnTLabsrule1000[1139], linewidth=20,label='#1139')#
+plt.plot(freq, ddqnTLabsrule1000[1152], linewidth=20,label='#1152')#
 
 font_properties = {'family': 'serif', 'weight': 'bold', 'size': 90}
 font = fm.FontProperties(family=font_properties['family'], weight=font_properties['weight'], size=font_properties['size'])
@@ -43,3 +45,4 @@ ax.spines['left'].set_linewidth(4)
 # Show the plot
 legend_font = {'family': 'serif', 'weight': 'bold', 'size': 80}
 plt.legend(prop=fm.FontProperties(**legend_font), loc='upper left')
+plt.show()

@@ -19,6 +19,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import namedtuple, deque
 
+# Rule based grid selection implementation
 def select_and_modify_pixels(matrix, n):
     # Get the shape of the matrix
     rows, cols = matrix.shape
@@ -77,7 +78,7 @@ def select_and_modify_pixels(matrix, n):
             count_changed_to_2 += 1
 
     return matrix, count_changed_to_2
-        
+#Environment (Comsol implementation on Python)     
 class TranMeta():
     def __init__(self):
         self.table_str=[]
@@ -85,7 +86,6 @@ class TranMeta():
     def Transmission_Metamaterial(self, idx1_list):
     
         lst = list(range(3,402))
-        # lst= lst.tolist()
         client= mph.start(cores=3)
         model= client.create('Model')
         model.clear()
@@ -390,7 +390,6 @@ class TranMeta():
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
     
-        # observ=[state0, table_str[1]]
         #model.save('TLLossMetamaterial1390e')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
@@ -400,39 +399,30 @@ class TranMeta():
         state= np.reshape(state, (1,400))
 
         lst = list(range(3,403))
-   
-        #lst2 = lst + [400+ i for i in range(3,403)] + [800+ i for i in range(3,403)]+ [1600+ i for i in range(3,403)]
-        
         lst1=np.asarray(lst)
         
-
         # Convert idx1 to a list of integers
         idx1=np.where(state == -2)[1]
 
-
-
-
         Org_list = [1,2, 2003]
-        #idx1=np.where(self.state == -2)[1]
+
         lst2=lst1[idx1]
-        #idx2=np.where(state == 2)[1]
-    
+        #Get the indices of the remaining 4 unit cells by adding 400, 800, 1200, 1600
         idx1_list = [i for i in lst2] + [400+ i for i in lst2] + [800+ i for i in lst2]+ [1200+ i for i in lst2] + [1600+ i for i in lst2]
-        #idx1_list = [lst[i] for i in idx1.tolist()] + [400+ i for i in idx1] + [800+ i for i in idx1]+ [1600+ i for i in idx1]
-        #idx2_list = lst[idx2]
+
     
-        idx1_list[idx1_list!=2003]
-        idx1_list= np.insert(Org_list,2,idx1_list)
-        idx1_list[idx1_list!=0]
-        idx1_list[idx1_list!=2003]
+        idx1_list[idx1_list!=2003]# remove 2003 if it is in the list
+        idx1_list= np.insert(Org_list,2,idx1_list)# include the air region before the metamaterial
+        idx1_list[idx1_list!=0]# remove 0 index
+        idx1_list[idx1_list!=2003]# remove 2003 index
     
     
         return idx1_list
 
     def step(self,action):
-        initial_matrix= np.full((20, 10), -2)
-        modified_matrix, count_changed = select_and_modify_pixels(initial_matrix, action)
-        self.state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)
+        initial_matrix= np.full((20, 10), -2)#initialize half the matrix
+        modified_matrix, count_changed = select_and_modify_pixels(initial_matrix, action)# apply the action and generate the new state
+        self.state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)#mirror to cover the whole space
         self.state=np.reshape(self.state,(1,400))
         idx1_list= self.Bin2Ind(self.state)
         table_str= self.Transmission_Metamaterial(idx1_list)

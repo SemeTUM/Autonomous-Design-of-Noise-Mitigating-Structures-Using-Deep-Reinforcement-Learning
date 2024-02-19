@@ -18,6 +18,7 @@ from ComEnv import DDPGEnv
 from collections import namedtuple, deque
 import scipy.io as sio
 import matplotlib.pyplot as plt
+import torch.optim as optim
 
 seed = 0
 torch.manual_seed(seed)
@@ -44,8 +45,6 @@ class DQNCnn(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(self.feature_size(), 128),
             nn.ReLU(),
-#            nn.Linear(128, 256),
-#            nn.ReLU(),
             nn.Linear(128, self.num_actions)
         )
         
@@ -59,14 +58,8 @@ class DQNCnn(nn.Module):
         return self.features(autograd.Variable(torch.zeros(1, *self.input_shape))).view(1, -1).size(1)
     
 #Replay buffer 
-
 class ReplayMemory:
-    """Fixed-size buffer to store experience tuples."""
-
-
     def __init__(self, buffer_size, batch_size, seed, device):
-
-
         self.memory = deque(maxlen=buffer_size)  
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
@@ -74,14 +67,10 @@ class ReplayMemory:
         self.device= device
     
     def add(self, state, action, reward, next_state, done):
-        """Add a new experience to memory."""
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
         
-
-    
     def sample(self):
-        """Randomly sample a batch of experiences from memory."""
         seed = 0
         torch.manual_seed(seed)
         np.random.seed(seed)
@@ -98,12 +87,8 @@ class ReplayMemory:
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
-        """Return the current size of internal memory."""
         return len(self.memory)
     
-    
-# dqnAgent with Fixed Target network
-
 class DDQNAgent():
     seed = 0
     torch.manual_seed(seed)
@@ -123,8 +108,6 @@ class DDQNAgent():
         self.replay_after = replay_after
         self.DQN = model
         self.tau = tau
-
-        
         # Q-Network
         self.policy_net = self.DQN(input_shape, action_size).to(self.device)
         self.target_net = self.DQN(input_shape, action_size).to(self.device)
@@ -132,13 +115,11 @@ class DDQNAgent():
         
         # Replay memory
         self.memory = ReplayMemory(self.buffer_size, self.batch_size, self.seed, self.device)
-        
         self.t_step = 0
         
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
-        
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % self.update_every
 
@@ -165,7 +146,7 @@ class DDQNAgent():
     def learn(self, experiences):
         states, actions, rewards, next_states, dones=experiences
         
-        Q_policy_next= self.policy_net(states).detach()
+        Q_policy_next= self.policy_net(next_states).detach()
         Q_targets_next=self.target_net(next_states).detach()
         
         _, policy_actions=Q_policy_next.max(1, keepdim=True)
@@ -174,9 +155,7 @@ class DDQNAgent():
         Q_targets= rewards + (self.gamma*Q_targets_next*(1 - dones))
         
         Q_expected= self.policy_net(states).gather(1, actions.unsqueeze(1))
-        
-    
-    
+
         loss = F.mse_loss(Q_expected, Q_targets[0].unsqueeze(1))
         self.optimizer.zero_grad()
         loss.backward()
@@ -192,7 +171,6 @@ class DDQNAgent():
 
 
 # HyperParameters
-
 INPUT_SHAPE = (1, 30, 30)
 ACTION_SIZE = 900#original 101
 SEED = 0
@@ -213,7 +191,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RandEnvDDQNCNN100"
+result_directory = f"RefProb_RandEnv2DDQNCNN100"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -221,9 +199,6 @@ agent = DDQNAgent(INPUT_SHAPE, ACTION_SIZE, SEED, device, BUFFER_SIZE, BATCH_SIZ
 
 ##epsilon
 epsilon_by_epsiode = lambda frame_idx: EPS_END + (EPS_START - EPS_END) * math.exp(-1. * frame_idx /EPS_DECAY)
-#env = DDPGEnv()
-##train
-
 
 def train(n_episodes=2000):#100
     ACTIONS= []
@@ -264,16 +239,7 @@ def train(n_episodes=2000):#100
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 #        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))
-        
-#        if i_episode % 100 == 0:
-#            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-#            fig = plt.figure()
-#            ax = fig.add_subplot(111)
-#            plt.plot(np.arange(len(scores)), scores)
-#            plt.ylabel('Score')
-#            plt.xlabel('Episode')
-#            plt.show()
-    
+
     return scores
 
 ###run the program

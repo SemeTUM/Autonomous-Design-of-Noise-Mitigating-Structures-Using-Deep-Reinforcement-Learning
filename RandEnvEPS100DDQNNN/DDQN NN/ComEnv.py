@@ -16,21 +16,15 @@ import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
 
-
-
 class DDPGEnv():
     def __init__(self):
         self.size= 30
-        self.lst= list(range(3,902))#np.linspace(3,902)
-        #self.state= np.random.choice([0, 1], size=(1,900), p=[0.1, 0.9])
-        #self.action_space= 900 
-        
+        self.lst= list(range(3,902))#np.linspace(3,902)        
 
     def ComSim(self,idx1_list, idx2_list):
         lst = list(range(2,902))
-        # lst= lst.tolist()
         client= mph.start(cores=1)
-        model= client.create('Model')
+        model= client.create('model1')
         model.clear()
         model=model.java
 
@@ -309,30 +303,20 @@ class DDPGEnv():
         model.result("pg3").set("ylabelactive", "off");
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
-
-        # observ=[state0, table_str[1]]
         #model.save('InputPython2')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
     
     def Bin2Ind(self,state):
-        self.state= np.reshape(self.state, (1,900))
+        state= np.reshape(state, (1,900))
         lst = list(range(2,902))
         lst=np.asarray(lst)
-        #P= np.random.uniform(0, 1) # action space
-        #state0=np.random.choice([0, 1], size=(1,900), p=[P, 1-P]) # state space
-
 
         idx1=np.where(state == -2)[1]
         idx2=np.where(state == 2)[1]
 
-
         idx1_list = lst[idx1]
         idx2_list = lst[idx2]
-
-
-        #idx1_list.insert(0, 1)
-
 
         return idx1_list, idx2_list
     
@@ -344,8 +328,6 @@ class DDPGEnv():
         idx1_list, idx2_list=self.Bin2Ind(self.state)
         table_str=self.ComSim( idx1_list, idx2_list)# calculate absorption coefficient
         # Reward
-
-            
         absorption = [str(i) for i in table_str[:,1]]
         absp= [float(i) for i in absorption]# absorption coefficient
         absorpSum= sum(float(i) for i in absorption)# Sum of absorption coefficient
@@ -354,17 +336,9 @@ class DDPGEnv():
         
         reward= abs((1- diff/26)**(2)) 
             
-#        if absorpSum > 23:
-#            reward= 500
-#        elif absorpSum > 20:
-#            reward= 400
-#        elif absorpSum > 19:
-#            reward= 100
-#        else:
-#            reward= -100
         diff=26 - absorpSum
         reward= abs((1- diff/26)**(2)) 
-        #done = absorpSum >= 26  
+        done = absorpSum >= 26  
 
         
         return np.array(self.state), reward, done, absorpSum, absp
