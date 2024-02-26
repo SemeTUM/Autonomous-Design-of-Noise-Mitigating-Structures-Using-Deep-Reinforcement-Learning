@@ -1,4 +1,4 @@
-#Autonomous Design of Noise Mitigating Structures Using Deep Reinforcement Learning
+# Autonomous Design of Noise Mitigating Structures Using Deep Reinforcement Learning
 
 The configuration of two materials that result in optimal absorption is usually addressed using optimization algorithms. 
 In recent years, data-driven approaches that rely on labeled data are used to design acoustic metamaterials and generate new shapes within the proximity of the trained data. 
