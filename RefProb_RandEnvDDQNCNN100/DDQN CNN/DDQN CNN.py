@@ -191,7 +191,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RandEnv2DDQNCNN100"
+result_directory = "RefProb_RandEnvDDQNCNN100"
 os.makedirs(result_directory, exist_ok=True)
 
 
