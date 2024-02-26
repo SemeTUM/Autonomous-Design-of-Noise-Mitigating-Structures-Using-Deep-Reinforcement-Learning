@@ -179,7 +179,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RuleEnvEPS100DQNNN2_fc1_size{FC1_SIZE}_fc2_size{FC2_SIZE}_fc3_size{64}_fc4_size{128}_UPDATE_EVERY{UPDATE_EVERY}_LR{LR}"
+result_directory = "RandEnvEPS100DQNNN"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -218,11 +218,11 @@ def train(n_episodes=2000):#100
         ABSPSUM.append(absorpSum)
         ABSP.append(absp)
       
-        np.save(os.path.join(result_directory, "DQNCNNactions.npy"), ACTIONS)
-        np.save(os.path.join(result_directory, "DQNCNNscores.npy"), scores)
-        np.save(os.path.join(result_directory, "DQNCNNstates.npy"), STATES)
-        np.save(os.path.join(result_directory, "DQNCNNabsorption.npy"), ABSP)
-        np.save(os.path.join(result_directory, "DQNCNNabsum.npy"), ABSPSUM)
+        np.save(os.path.join(result_directory, "DQNNNactions.npy"), ACTIONS)
+        np.save(os.path.join(result_directory, "DQNNNscores.npy"), scores)
+        np.save(os.path.join(result_directory, "DQNNNstates.npy"), STATES)
+        np.save(os.path.join(result_directory, "DQNNNabsorption.npy"), ABSP)
+        np.save(os.path.join(result_directory, "DQNNNabsum.npy"), ABSPSUM)
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))
