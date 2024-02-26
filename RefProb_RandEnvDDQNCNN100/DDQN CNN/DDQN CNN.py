@@ -191,7 +191,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RandEnv2DDQNCNN100"
+result_directory = f"RefProb_RandEnvDDQNCNN100"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -227,15 +227,15 @@ def train(n_episodes=2000):#100
         ABSPSUM.append(absorpSum)
         ABSP.append(absp)
       
-        np.save(os.path.join(result_directory, "DQNCNNactions.npy"), ACTIONS)
-        np.save(os.path.join(result_directory, "DQNCNNscores.npy"), scores)
-        np.save(os.path.join(result_directory, "DQNCNNstates.npy"), STATES)
-        np.save(os.path.join(result_directory, "DQNCNNabsorption.npy"), ABSP)
-        np.save(os.path.join(result_directory, "DQNCNNabsum.npy"), ABSPSUM)
+        np.save(os.path.join(result_directory, "DDQNCNNactions.npy"), ACTIONS)
+        np.save(os.path.join(result_directory, "DDQNCNNscores.npy"), scores)
+        np.save(os.path.join(result_directory, "DDQNCNNstates.npy"), STATES)
+        np.save(os.path.join(result_directory, "DDQNCNNabsorption.npy"), ABSP)
+        np.save(os.path.join(result_directory, "DDQNCNNabsum.npy"), ABSPSUM)
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))
-            model_path = os.path.join(result_directory, "RefRandtrained_dqncnn{}.pth".format(i_episode))
+            model_path = os.path.join(result_directory, "RefRandtrained_ddqncnn{}.pth".format(i_episode))
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 #        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))

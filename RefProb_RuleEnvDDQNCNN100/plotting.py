@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.font_manager as fm
 
 #Figure 4a
+#ddqncnnabs>>random environment>>DDQNCnn>>DDQNCNNabs100.npy
+#ddqncnnabs>>rule environment>>DDQNCnn>>DDQNCNNabsum100.npy
 fig = plt.figure(figsize=(50,40), dpi=300)
 ax = fig.add_subplot(111)
 plt.plot(np.arange(len(ddqncnnabs)), ddqncnnabs, linewidth=6,color='red', alpha=0.6,label='Random selection')# 

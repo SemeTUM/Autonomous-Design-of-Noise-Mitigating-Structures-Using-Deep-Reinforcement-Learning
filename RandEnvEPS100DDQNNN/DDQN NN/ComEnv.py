@@ -303,7 +303,7 @@ class DDPGEnv():
         model.result("pg3").set("ylabelactive", "off");
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
-        #model.save('InputPython2')
+        model.save('InputPython20')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
     

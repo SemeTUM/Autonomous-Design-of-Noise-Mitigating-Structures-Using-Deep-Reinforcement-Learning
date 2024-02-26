@@ -213,7 +213,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"TL_Rule2Env100DDQNCNN"
+result_directory = "TL_RuleEnv100DDQNCNN"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -255,8 +255,8 @@ def train(n_episodes=2000):#100
         np.save(os.path.join(result_directory, "DDQNCNNactions.npy"), ACTIONS)
         np.save(os.path.join(result_directory, "DDQNCNNscores.npy"), scores)
         np.save(os.path.join(result_directory, "DDQNCNNstates.npy"), STATES)
-        np.save(os.path.join(result_directory, "DDQNCNNabsorption.npy"), ABSP)
-        np.save(os.path.join(result_directory, "DDQNCNNabsum.npy"), ABSPSUM)
+        np.save(os.path.join(result_directory, "DDQNCNNTL.npy"), ABSP)
+        np.save(os.path.join(result_directory, "DDQNCNNTlsum.npy"), ABSPSUM)
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))

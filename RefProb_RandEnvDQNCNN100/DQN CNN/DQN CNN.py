@@ -200,7 +200,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RandEnvDQNCNN"
+result_directory = "RefProb_RandEnvDQNCNN"
 os.makedirs(result_directory, exist_ok=True)
 
 
