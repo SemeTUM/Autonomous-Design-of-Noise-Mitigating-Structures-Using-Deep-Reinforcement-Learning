@@ -303,8 +303,8 @@ class DDPGEnv():
         model.result("pg3").set("ylabelactive", "off");
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
-        model.save('InputPython20')
-        client.remove('Model')
+        #model.save('InputPython20')
+        client.remove('model1')
         return table_str  #two observations /absorption/ binary state
     
     def Bin2Ind(self,state):
@@ -312,8 +312,8 @@ class DDPGEnv():
         lst = list(range(2,902))
         lst=np.asarray(lst)
 
-        idx1=np.where(state == -2)[1]
-        idx2=np.where(state == 2)[1]
+        idx1=np.where(state == -1)[1]
+        idx2=np.where(state == 1)[1]
 
         idx1_list = lst[idx1]
         idx2_list = lst[idx2]
@@ -323,15 +323,15 @@ class DDPGEnv():
     
     def step(self, action):
 
-        self.state= np.random.choice([-2, 2], size=(1,900), p=[action/900, 1-(action/900)])#Generate random states
-        self.state= np.reshape(self.state, (1,900))
-        idx1_list, idx2_list=self.Bin2Ind(self.state)
+        state= np.random.choice([-1, 1], size=(1,900), p=[action/900, 1-(action/900)])#Generate random states
+        state= np.reshape(state, (1,900))
+        idx1_list, idx2_list=self.Bin2Ind(state)
         table_str=self.ComSim( idx1_list, idx2_list)# calculate absorption coefficient
         # Reward
         absorption = [str(i) for i in table_str[:,1]]
         absp= [float(i) for i in absorption]# absorption coefficient
         absorpSum= sum(float(i) for i in absorption)# Sum of absorption coefficient
-        fracvoid= np.sum((self.state==2))
+        fracvoid= np.sum((state==1))
         diff= 26-absorpSum
         
         reward= abs((1- diff/26)**(2)) 
@@ -341,9 +341,9 @@ class DDPGEnv():
         done = absorpSum >= 26  
 
         
-        return np.array(self.state), reward, done, absorpSum, absp
+        return np.array(state), reward, done, absorpSum, absp
         
     def reset(self):
-        self.state = np.random.choice([-2, 2], size=(1,900), p=[0.1, 0.9])
+        self.state = np.random.choice([-1, 1], size=(1,900), p=[0.1, 0.9])
         return self.state
     

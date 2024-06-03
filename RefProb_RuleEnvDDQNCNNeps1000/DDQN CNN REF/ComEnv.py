@@ -45,8 +45,8 @@ def select_and_modify_pixels(matrix, n):
             current_row += 1
 
         # Check if the new state is -2, and if so, change it to 2
-        if matrix[current_row, current_col] == -2:
-            matrix[current_row, current_col] = 2
+        if matrix[current_row, current_col] == -1:
+            matrix[current_row, current_col] = 1
             count_changed_to_2 += 1
 
     # Check if the count is less than n and repeat the process if needed
@@ -68,8 +68,8 @@ def select_and_modify_pixels(matrix, n):
             direction = random.choice(['left', 'right', 'up', 'down'])
 
         # Check if the new state is -2, and if so, change it to 2
-        if matrix[current_row, current_col] == -2:
-            matrix[current_row, current_col] = 2
+        if matrix[current_row, current_col] == -1:
+            matrix[current_row, current_col] = 1
             count_changed_to_2 += 1
 
     return matrix, count_changed_to_2
@@ -372,8 +372,8 @@ class DDPGEnv():
         lst = list(range(2,902))
         lst=np.asarray(lst)
 
-        idx1=np.where(state == -2)[1]
-        idx2=np.where(state == 2)[1]
+        idx1=np.where(state == -1)[1]
+        idx2=np.where(state == 1)[1]
 
         idx1_list = lst[idx1]
         idx2_list = lst[idx2]
@@ -383,7 +383,7 @@ class DDPGEnv():
     
     def step(self, action):
 
-        initial_matrix= np.full((30, 15), -2)
+        initial_matrix= np.full((30, 15), -1)
         modified_matrix, count_changed = select_and_modify_pixels(initial_matrix, action)
         self.state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)
         self.state= np.reshape(self.state, (1,900))
@@ -393,7 +393,7 @@ class DDPGEnv():
         absorption = [str(i) for i in table_str[:,1]]
         absp= [float(i) for i in absorption]
         absorpSum= sum(float(i) for i in absorption)
-        fracvoid= np.sum((self.state==2))
+        fracvoid= np.sum((self.state==1))
         diff= 26-absorpSum
         
         reward= abs((1- diff/26)**(2)) 
@@ -406,7 +406,7 @@ class DDPGEnv():
         return np.array(self.state), reward, done, absorpSum, absp
         
     def reset(self):
-        initial_matrix= np.full((30, 15), -2)
+        initial_matrix= np.full((30, 15), -1)
         self.state= np.concatenate((initial_matrix, np.flip(initial_matrix, axis=1)),axis=1)
         return self.state
     

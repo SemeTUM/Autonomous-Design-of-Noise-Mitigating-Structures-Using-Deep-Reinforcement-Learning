@@ -179,7 +179,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = "RuleEnvEPS100DQNNN"
+result_directory = "RandEnvEPS100DQNNN1"
 os.makedirs(result_directory, exist_ok=True)
 
 

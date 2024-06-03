@@ -34,18 +34,18 @@ class DQNCnn(nn.Module):
         self.num_actions = num_actions
         
         self.features = nn.Sequential(
-            nn.Conv2d(input_shape[0], 32, kernel_size=2, stride=2),
+            nn.Conv2d(input_shape[0], 128, kernel_size=2, stride=2),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=2, stride=2),
+            nn.Conv2d(128, 128, kernel_size=2, stride=2),
             nn.ReLU(),
-            nn.Conv2d(64, 128, kernel_size=2, stride=1),
+            nn.Conv2d(128, 256, kernel_size=2, stride=1),
             nn.ReLU()
         )
         
         self.fc = nn.Sequential(
-            nn.Linear(self.feature_size(), 128),
+            nn.Linear(self.feature_size(), 256),
             nn.ReLU(),
-            nn.Linear(128, self.num_actions)
+            nn.Linear(256, self.num_actions)
         )
         
     def forward(self, x):
@@ -176,11 +176,11 @@ ACTION_SIZE = 900#original 101
 SEED = 0
 GAMMA = 0.99           # discount factor
 BUFFER_SIZE = 1000   # replay buffer size1000
-BATCH_SIZE = 64       # Update batch size
+BATCH_SIZE = 128#64       # Update batch size
 LR = 0.001            # learning rate 
 TAU = 1e-3             # for soft update of target parameters
 UPDATE_EVERY = 100     # how often to update the network
-UPDATE_TARGET = 100  # After which thershold replay to be started 100
+replay_after = 500  # After which thershold replay to be started 100
 EPS_START = 0.99       # starting value of epsilon
 EPS_END = 0.01         # Ending value of epsilon
 EPS_DECAY = 100        # Rate by which epsilon to be decayed
@@ -191,11 +191,11 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = f"RefProb_RandEnvDDQNCNN100"
+result_directory = "RefProb_RandEnvDDQNCNN32646464640.001_100_10064Optim"
 os.makedirs(result_directory, exist_ok=True)
 
 
-agent = DDQNAgent(INPUT_SHAPE, ACTION_SIZE, SEED, device, BUFFER_SIZE, BATCH_SIZE, GAMMA, LR, TAU, UPDATE_EVERY, UPDATE_TARGET, DQNCnn)
+agent = DDQNAgent(INPUT_SHAPE, ACTION_SIZE, SEED, device, BUFFER_SIZE, BATCH_SIZE, GAMMA, LR, TAU, UPDATE_EVERY, replay_after, DQNCnn)
 
 ##epsilon
 epsilon_by_epsiode = lambda frame_idx: EPS_END + (EPS_START - EPS_END) * math.exp(-1. * frame_idx /EPS_DECAY)

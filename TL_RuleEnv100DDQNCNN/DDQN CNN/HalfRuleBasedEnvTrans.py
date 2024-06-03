@@ -50,8 +50,8 @@ def select_and_modify_pixels(matrix, n):
             current_row += 1
 
         # Check if the new state is -2, and if so, change it to 2
-        if matrix[current_row, current_col] == -2:
-            matrix[current_row, current_col] = 2
+        if matrix[current_row, current_col] == -1:
+            matrix[current_row, current_col] = 1
             count_changed_to_2 += 1
 
     # Check if the count is less than n and repeat the process if needed
@@ -73,8 +73,8 @@ def select_and_modify_pixels(matrix, n):
             direction = random.choice(['left', 'right', 'up', 'down'])
 
         # Check if the new state is -2, and if so, change it to 2
-        if matrix[current_row, current_col] == -2:
-            matrix[current_row, current_col] = 2
+        if matrix[current_row, current_col] == -1:
+            matrix[current_row, current_col] = 1
             count_changed_to_2 += 1
 
     return matrix, count_changed_to_2
@@ -390,7 +390,7 @@ class TranMeta():
         table_str=model.result().table('tbl1').getTableData(1);
         table_str= np.array(table_str, dtype=object)
     
-        #model.save('TLLossMetamaterial1390e')
+        model.save('TLLossMetamaterial521e')
         client.remove('Model')
         return table_str  #two observations /absorption/ binary state
 
@@ -402,7 +402,7 @@ class TranMeta():
         lst1=np.asarray(lst)
         
         # Convert idx1 to a list of integers
-        idx1=np.where(state == -2)[1]
+        idx1=np.where(state == -1)[1]
 
         Org_list = [1,2, 2003]
 
@@ -420,28 +420,28 @@ class TranMeta():
         return idx1_list
 
     def step(self,action):
-        initial_matrix= np.full((20, 10), -2)#initialize half the matrix
+        initial_matrix= np.full((20, 10), -1)#initialize half the matrix
         modified_matrix, count_changed = select_and_modify_pixels(initial_matrix, action)# apply the action and generate the new state
-        self.state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)#mirror to cover the whole space
-        self.state=np.reshape(self.state,(1,400))
-        idx1_list= self.Bin2Ind(self.state)
+        state= np.concatenate((modified_matrix, np.flip(modified_matrix, axis=1)),axis=1)#mirror to cover the whole space
+        state=np.reshape(state,(1,400))
+        idx1_list= self.Bin2Ind(state)
         table_str= self.Transmission_Metamaterial(idx1_list)
 
         TransLoss = [str(i) for i in table_str[:,1]]
         Tran= [float(i) for i in TransLoss]
         TransLossSum= sum(float(i) for i in TransLoss)
-        fracvoid= np.sum((self.state==2))
-        diff= 1500-TransLossSum
+        fracvoid= np.sum((state==1))
+        diff= 400-TransLossSum
         
-        reward= np.abs(1- (diff/1500))**(1/2) 
+        reward= np.abs(1- (diff/400))**(1/2) 
         
             
-        done = TransLossSum >= 1500 
+        done = TransLossSum >= 400 
 
         
-        return np.array(self.state), reward, done, TransLossSum, Tran
+        return np.array(state), reward, done, TransLossSum, Tran
         
     def reset(self):
-        state = np.full((20, 10), -2)
+        state = np.full((20, 10), -1)
         state= np.concatenate((state, np.flip(state, axis=1)),axis=1)
         return state

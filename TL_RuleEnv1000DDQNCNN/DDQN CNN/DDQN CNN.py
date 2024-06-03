@@ -178,7 +178,7 @@ class DDQNAgent():
 ## Parameters
 
 INPUT_SHAPE = (1, 20, 20)
-ACTION_SIZE = 200#450#900#original 101
+ACTION_SIZE = 200#400 for random environment
 SEED = 0
 GAMMA = 0.99           # discount factor
 BUFFER_SIZE = 1000   # replay buffer size1000
@@ -197,7 +197,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = "TL_RuleEnv1000DDQNCNN"
+result_directory = "TL_RuleEnv1000DDQNCNN_Rew400"
 os.makedirs(result_directory, exist_ok=True)
 
 

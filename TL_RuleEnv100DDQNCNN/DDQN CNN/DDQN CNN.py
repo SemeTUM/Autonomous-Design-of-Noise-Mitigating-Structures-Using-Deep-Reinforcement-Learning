@@ -74,13 +74,13 @@ class ReplayMemory:
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(0)
         self.device= device
-    
+
     def add(self, state, action, reward, next_state, done):
         #Add a new experience to memory
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
+
         
-    
     def sample(self):
         #Randomly sample a batch of experiences from memory
         #reproduce sample selection 
@@ -102,7 +102,7 @@ class ReplayMemory:
     def __len__(self):
         #Return the current size of internal memory
         return len(self.memory)
-    
+
 
 class DDQNAgent():
     #reproducibility
@@ -181,6 +181,7 @@ class DDQNAgent():
         loss.backward()
         self.optimizer.step()       
         self.soft_update(self.policy_net, self.target_net, self.tau)
+
         
     def checkpoint(self, filename):
          torch.save(self.policy_net.state_dict(), filename)
@@ -213,7 +214,7 @@ start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = "TL_RuleEnv100DDQNCNN"
+result_directory = "TL_RuleEnv100DDQNCNN1"
 os.makedirs(result_directory, exist_ok=True)
 
 

@@ -179,7 +179,7 @@ class DDQNAgent():
 
 # HyperParameters
 INPUT_SHAPE = (1, 30, 30)
-ACTION_SIZE = 450#900#original 101
+ACTION_SIZE = 450#900
 SEED = 0
 GAMMA = 0.99           # discount factor
 BUFFER_SIZE = 1000   # replay buffer size1000
@@ -191,14 +191,12 @@ UPDATE_TARGET = 100  # After which thershold replay to be started 100
 EPS_START = 0.99       # starting value of epsilon
 EPS_END = 0.01         # Ending value of epsilon
 EPS_DECAY = 100        # Rate by which epsilon to be decayed
-FC1_SIZE= 32
-FC2_SIZE= 64
 
 start_epoch=0
 scores= []
 scores_window=deque(maxlen=100)
 
-result_directory = "RefProb_RuleEnvDDQNCNN"
+result_directory = "RefProb_RuleEnvDDQNCNN1"
 os.makedirs(result_directory, exist_ok=True)
 
 
@@ -242,7 +240,7 @@ def train(n_episodes=2000):#100
         
         if i_episode % 100==0:
             #torch.save(agent.policy_net.state_dict(), "ddqn{}.pth".format(i_episode))
-            model_path = os.path.join(result_directory, "RefRandtrained_ddqncnn{}.pth".format(i_episode))
+            model_path = os.path.join(result_directory, "Refruletrained_ddqncnn{}.pth".format(i_episode))
             agent.checkpoint(model_path)
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
 #        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, score))
